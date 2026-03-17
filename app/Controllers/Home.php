@@ -1,19 +1,18 @@
 <?php
 
 class Home extends Controller {
-public function index() {
-    $db = new Database();
-    $status = $db->connect() ? "Connecté" : "Erreur de connexion";
+    public function index() {
+        $db = new Database();
+        $status = "Connecté"; 
 
-    // This data array is what the View uses to fill in the blanks
-    $data = [
-        'title' => 'Tableau de bord',
-        'db_status' => $status,
-        'userPrenom' => 'Admin', // Temporary test data
-        'userNom' => 'User',
-        'userProfilImg' => 'default.png' // Make sure this exists in assets/img/photo/
-    ];
+        $data = [
+            'title' => 'Tableau de bord',
+            'db_status' => $status,
+            'userPrenom' => 'Admin',
+            'userNom' => 'User',
+            'userProfilImg' => 'default.png' 
+        ];
 
-    $this->view('index', $data);
-}
+        $this->view('index', $data);
+    }
 }

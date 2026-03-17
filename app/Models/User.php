@@ -1,22 +1,78 @@
 <?php
-
 class User {
     private $db;
 
     public function __construct() {
-        $database = new Database();
-        $this->db = $database->connect();
+        $this->db = new Database();
+    }
+    public function getUsers() {
+        
+        $this->db->query("SELECT u.*, g.nom_groupe 
+                        FROM utilisateur u 
+                        LEFT JOIN groupe g ON u.id_groupe = g.id_groupe 
+                        ORDER BY u.nom ASC");
+        return $this->db->resultSet();
     }
 
-    // This replaces the logic from login.inc.php
-    public function login($username, $password) {
-        $sql = "SELECT * FROM utilisateur WHERE username = :username AND pass_user = :password";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([
-            'username' => $username,
-            'password' => $password
-        ]);
+    public function add($data) {
+        $this->db->query("INSERT INTO utilisateur (nom, prenom, email, password, id_groupe) VALUES(:nom, :prenom, :email, :password, :id_groupe)");
+        $this->db->bind(':nom', $data['nom']);
+        $this->db->bind(':prenom', $data['prenom']);
+        $this->db->bind(':email', $data['email']);
+        $this->db->bind(':password', $data['password']);
+        $this->db->bind(':id_groupe', $data['id_groupe']);
+        
+        return $this->db->execute();
+    }
+    public function getUserById($id) {
+        $this->db->query("SELECT * FROM utilisateur WHERE id_user = :id");
+        $this->db->bind(':id', $id);
+        return $this->db->single();
+    }
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function update($data) {
+        $this->db->query("UPDATE utilisateur SET nom = :nom, prenom = :prenom, email = :email, id_groupe = :id_groupe WHERE id_user = :id");
+        $this->db->bind(':id', $data['id']);    
+        $this->db->bind(':nom', $data['nom']);
+        $this->db->bind(':prenom', $data['prenom']);
+        $this->db->bind(':email', $data['email']);
+        $this->db->bind(':id_groupe', $data['id_groupe']);
+        return $this->db->execute();
+    }
+
+
+    public function delete($id) {
+        $this->db->query("DELETE FROM utilisateur WHERE id_user = :id");
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
+    }
+    public function findUserByEmail($email) {
+        $this->db->query("SELECT * FROM utilisateur WHERE email = :email");
+        $this->db->bind(':email', $email);
+
+        $row = $this->db->single();
+
+        if($this->db->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public function login($email, $password) {
+        $this->db->query("SELECT * FROM utilisateur WHERE email = :email");
+        $this->db->bind(':email', $email);
+
+        $row = $this->db->single();
+
+        if($row) {
+            $hashed_password = $row->password;
+            if(password_verify($password, $hashed_password)) {
+                return $row;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

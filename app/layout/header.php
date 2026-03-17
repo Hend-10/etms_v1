@@ -9,7 +9,11 @@
     
     <div class="top-menu">
         <ul class="nav pull-right top-menu">
-            <li><a class="logout" href="<?php echo URLROOT; ?>/login/logout">Déconnexion</a></li>
+           <li>
+    <a class="logout" href="<?php echo URLROOT; ?>/users/logout">
+        <i class="fa fa-sign-out"></i> Déconnexion
+    </a>
+</li>
         </ul>
     </div>
 </header>

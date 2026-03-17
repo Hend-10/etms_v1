@@ -13,8 +13,6 @@
         <div class="content-panel">
           <h4><i class="fa fa-check-circle"></i> État du Système</h4>
           <p>Base de données : <b><?php echo $data['db_status']; ?></b></p>
-          <hr>
-          <p>Bienvenue dans votre structure MVC pour <strong>CLIMA TRACK</strong>.</p>
         </div>
 
       </div>

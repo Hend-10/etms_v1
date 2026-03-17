@@ -1,18 +1,22 @@
 <?php
 class App {
-    protected $controller = 'Home';
+    // Change this from 'Home' to 'Pages' (Case sensitive!)
+    protected $controller = 'Pages'; 
     protected $method = 'index';
     protected $params = [];
 
     public function __construct() {
         $url = $this->parseUrl();
 
-        if(isset($url[0]) && file_exists('../app/Controllers/' . ucfirst($url[0]) . '.php')) {
-            $this->controller = ucfirst($url[0]);
-            unset($url[0]);
+        if(isset($url[0])) {
+            if(file_exists('../app/Controllers/' . ucfirst($url[0]) . '.php')) {
+                $this->controller = ucfirst($url[0]);
+                unset($url[0]);
+            }
         }
 
         require_once '../app/Controllers/' . $this->controller . '.php';
+
         $this->controller = new $this->controller;
 
         if(isset($url[1])) {

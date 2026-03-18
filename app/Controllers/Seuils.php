@@ -1,6 +1,15 @@
 <?php
 class Seuils extends Controller {
     public function __construct() {
+        if(!isset($_SESSION['user_id'])) {
+        header('location: ' . URLROOT . '/users/login');
+        exit();
+    }
+
+    if($_SESSION['user_role'] != 'Administrateur') {
+        header('location: ' . URLROOT . '/pages/index');
+        exit();
+    }
         $this->seuilModel = $this->model('Seuil');
         $this->capteurModel = $this->model('Capteur');
     }

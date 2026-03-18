@@ -5,7 +5,19 @@ class Users extends Controller {
         $this->groupeModel = $this->model('Groupe');
     }
 
+    private function isAdmin() {
+        if(!isset($_SESSION['user_id'])) {
+            header('location: ' . URLROOT . '/users/login');
+            exit();
+        }
+        if($_SESSION['user_role'] != 'Administrateur') {
+            header('location: ' . URLROOT . '/pages/index');
+            exit();
+        }
+    }
+
     public function index() {
+        $this->isAdmin(); 
         $users = $this->userModel->getUsers();
         $groupes = $this->groupeModel->getGroupes();
         $data = [
@@ -16,8 +28,11 @@ class Users extends Controller {
         $this->view('users/index', $data);
     }
 
-   public function add() {
+public function add() {
+    $this->isAdmin(); // Security check
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // 1. Sanitize POST data
         $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
         $data = [
@@ -26,91 +41,48 @@ class Users extends Controller {
             'email' => trim($_POST['email']),
             'password' => trim($_POST['password']),
             'id_groupe' => trim($_POST['id_groupe']),
-            'email_err' => '' 
+            'nom_err' => '',
+            'email_err' => '',
+            'password_err' => ''
         ];
 
-        if($this->userModel->findUserByEmail($data['email'])) {
-            $data['email_err'] = 'Cet email est déjà utilisé.';
-        }
+        // 2. Simple Validation
+        if(empty($data['email'])) $data['email_err'] = 'Please enter email';
+        if(empty($data['password'])) $data['password_err'] = 'Please enter password';
 
-        if(empty($data['email_err'])) {
+        // 3. Check for errors before saving
+        if(empty($data['email_err']) && empty($data['password_err'])) {
+            // Hash the password for security
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
-            if ($this->userModel->add($data)) {
-                flash('user_message', 'Utilisateur ajouté !');
-                header('location: ' . URLROOT . '/users');
+            // Call the model method you already wrote
+            if($this->userModel->add($data)) {
+                header('location: ' . URLROOT . '/users/index');
             } else {
-                die('Erreur interne.');
+                die('Something went wrong');
             }
         } else {
-            $data['groupes'] = $this->groupeModel->getGroupes();
-            $data['title'] = 'Ajouter un utilisateur';
-            
-            flash('user_message', $data['email_err'], 'alert alert-danger');
-            $this->view('users/add', $data);
+            // Load view with errors
+            $this->view('Users/add', $data);
         }
 
     } else {
+        // GET Request: Prepare data for the form
+        $groupes = $this->groupeModel->getGroupes(); 
         $data = [
-            'title' => 'Ajouter un utilisateur',
-            'groupes' => $this->groupeModel->getGroupes()
+            'groupes' => $groupes,
+            'nom' => '',
+            'prenom' => '',
+            'email' => '',
+            'password' => '',
+            'id_groupe' => ''
         ];
-        $this->view('users/add', $data);
-    }
-}
-public function edit($id) {
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
-        $data = [
-            'id' => $id,
-            'nom' => trim($_POST['nom']),
-            'prenom' => trim($_POST['prenom']),
-            'email' => trim($_POST['email']),
-            'id_groupe' => trim($_POST['id_groupe'])
-        ];
-
-        if ($this->userModel->update($data)) {
-            flash('user_message', 'Les informations de ' . $data['prenom'] . ' ont été mises à jour.');
-            
-            header('location: ' . URLROOT . '/users');
-        } else {
-            die('Quelque chose s\'est mal passé lors de la mise à jour.');
-        }
-
-    } else {
-        $user = $this->userModel->getUserById($id);
-        
-        $groupes = $this->groupeModel->getGroupes();
-        if(!$user) {
-            header('location: ' . URLROOT . '/users');
-            exit();
-        }
-
-        $data = [
-            'title' => 'Modifier l\'utilisateur',
-            'user' => $user,
-            'groupes' => $groupes
-        ];
-
-        $this->view('users/edit', $data);
+        // Load the view file
+        $this->view('Users/add', $data);
     }
 }
 
- public function delete($id) {
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        if ($this->userModel->delete($id)) {
-            flash('user_message', 'Utilisateur supprimé avec succès.', 'alert alert-danger');
-            header('location: ' . URLROOT . '/users');
-        } else {
-            die('Erreur lors de la suppression');
-        }
-    } else {
-        header('location: ' . URLROOT . '/users');
-    }
-}
-public function login() {
-        // REDIRECT IF ALREADY LOGGED IN
+    public function login() {
         if(isset($_SESSION['user_id'])){
             header('location: ' . URLROOT . '/pages/index');
             exit();
@@ -118,7 +90,6 @@ public function login() {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
             $data = [
                 'email' => trim($_POST['email']),
                 'password' => trim($_POST['password']),
@@ -126,15 +97,12 @@ public function login() {
                 'password_err' => '',
             ];
 
-            // Validate Email exists
             if(!$this->userModel->findUserByEmail($data['email'])) {
-                $data['email_err'] = 'Aucun utilisateur trouvé avec cet email.';
+                $data['email_err'] = 'Aucun utilisateur trouvé.';
             }
 
-            // Proceed if no email error
             if(empty($data['email_err'])) {
                 $loggedInUser = $this->userModel->login($data['email'], $data['password']);
-
                 if($loggedInUser) {
                     $this->createUserSession($loggedInUser);
                 } else {
@@ -144,34 +112,56 @@ public function login() {
             } else {
                 $this->view('auth/login', $data);
             }
-
         } else {
-            $data = [
-                'email' => '',
-                'password' => '',
-                'email_err' => '',
-                'password_err' => '',
-            ];
-
+            $data = ['email' => '', 'password' => '', 'email_err' => '', 'password_err' => ''];
             $this->view('auth/login', $data);
         }
     }
 
     public function createUserSession($user) {
-        $_SESSION['user_id'] = $user->id_user;
-        $_SESSION['user_email'] = $user->email;
-        $_SESSION['user_nom'] = $user->nom;
-        $_SESSION['user_prenom'] = $user->prenom;
-        $_SESSION['user_id_groupe'] = $user->id_groupe;
-        
-        header('location: ' . URLROOT . '/pages/index');
-    }
+    $_SESSION['user_id'] = $user->id_user;
+    $_SESSION['user_email'] = $user->email;
+    $_SESSION['user_nom'] = $user->nom;
+    $_SESSION['user_prenom'] = $user->prenom;
+    $_SESSION['user_id_groupe'] = $user->id_groupe;
+    
+    $_SESSION['user_role'] = $user->nom_groupe; 
+    
+    header('location: ' . URLROOT . '/pages/index');
+}
 
     public function logout() {
-        unset($_SESSION['user_id']);
-        unset($_SESSION['user_email']);
-        unset($_SESSION['user_nom']);
+        $_SESSION = array();
         session_destroy();
         header('location: ' . URLROOT . '/users/login');
+        exit();
     }
+public function profile() {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if(isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === 0) {
+            
+            $file = $_FILES['profile_image'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png'];
+
+            if(in_array($ext, $allowed)) {
+                $newName = "user_" . $_SESSION['user_id'] . "_" . time() . "." . $ext;
+                
+                $targetPath = "assets/img/photo/" . $newName;
+
+                if(move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    if($this->userModel->updateProfileImage($_SESSION['user_id'], $newName)) {
+                        $_SESSION['user_photo'] = $newName;
+                        flash('profile_message', 'Votre photo a été mise à jour !');
+                    }
+                }
+            } else {
+                flash('profile_message', 'Le format du fichier est invalide.', 'alert alert-danger');
+            }
+        }
+        header('location: ' . URLROOT . '/users/profile');
+    } else {
+        $this->view('users/profile');
+    }
+}
 }

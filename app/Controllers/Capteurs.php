@@ -2,9 +2,14 @@
 class Capteurs extends Controller {
     public function __construct() {
         if(!isset($_SESSION['user_id'])) {
-            header('location: ' . URLROOT . '/users/login');
-            exit();
-        }
+        header('location: ' . URLROOT . '/users/login');
+        exit();
+    }
+
+    if($_SESSION['user_role'] != 'Administrateur') {
+        header('location: ' . URLROOT . '/pages/index');
+        exit();
+    }
         $this->capteurModel = $this->model('Capteur');
     }
 

@@ -1,14 +1,20 @@
 <?php
 class Affectations extends Controller {
     public function __construct() {
-        if(!isset($_SESSION['user_id'])) {
-            header('location: ' . URLROOT . '/users/login');
-            exit();
-        }
-        $this->affectationModel = $this->model('Affectation');
-        $this->capteurModel = $this->model('Capteur'); // Assume you have these models
-        $this->emplacementModel = $this->model('Emplacement');
+    if(!isset($_SESSION['user_id'])) {
+        header('location: ' . URLROOT . '/users/login');
+        exit();
     }
+
+    if($_SESSION['user_role'] != 'Administrateur') {
+        header('location: ' . URLROOT . '/pages/index');
+        exit();
+    }
+
+    $this->affectationModel = $this->model('Affectation');
+    $this->capteurModel = $this->model('Capteur');
+    $this->emplacementModel = $this->model('Emplacement');
+}
 
     public function index() {
         $affectations = $this->affectationModel->getAffectations();

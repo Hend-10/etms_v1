@@ -59,20 +59,24 @@ class User {
         }
     }
     public function login($email, $password) {
-        $this->db->query("SELECT * FROM utilisateur WHERE email = :email");
-        $this->db->bind(':email', $email);
+    $this->db->query('SELECT u.*, g.nom_groupe 
+                      FROM utilisateur u 
+                      JOIN groupe g ON u.id_groupe = g.id_groupe 
+                      WHERE u.email = :email');
+    
+    $this->db->bind(':email', $email);
+    $row = $this->db->single();
 
-        $row = $this->db->single();
-
-        if($row) {
-            $hashed_password = $row->password;
-            if(password_verify($password, $hashed_password)) {
-                return $row;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
+    if ($row && password_verify($password, $row->password)) {
+        return $row;
+    } else {
+        return false;
     }
+}
+public function updateProfileImage($id, $image) {
+    $this->db->query('UPDATE utilisateur SET photo = :photo WHERE id_user = :id');
+    $this->db->bind(':photo', $image);
+    $this->db->bind(':id', $id);
+    return $this->db->execute();
+}
 }

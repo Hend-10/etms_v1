@@ -18,4 +18,5 @@ class Records extends Controller {
 
         $this->view('records/index', $data);
     }
+     
 }

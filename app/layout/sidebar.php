@@ -28,6 +28,16 @@
         </ul> 
       </li>
 
+      <li>
+        <a href="<?php echo URLROOT; ?>/alertes/index">
+          <i class="fa fa-bell"></i>
+          <span>Alertes</span>
+          <?php if(isset($data['alert_count']) && $data['alert_count'] > 0) : ?>
+            <span class="label label-danger pull-right"><?php echo $data['alert_count']; ?></span>
+          <?php endif; ?>
+        </a>
+      </li>
+
       <li class="sub-menu">
         <a href="javascript:;">
           <i class="fa fa-users"></i>
@@ -45,9 +55,11 @@
           <span>Configuration</span>
         </a>
         <ul class="sub">
-          <li><a href="<?php echo URLROOT; ?>/capteurs">Capteurs</a></li>
-          <li><a href="<?php echo URLROOT; ?>/emplacements">Emplacements</a></li>
-          <li><a href="<?php echo URLROOT; ?>/categories"><i class="fa fa-tags"></i> Catégories</a></li>
+          <li><a href="<?php echo URLROOT; ?>/capteurs/index">Capteurs</a></li>
+          <li><a href="<?php echo URLROOT; ?>/emplacements/index">Emplacements</a></li>
+          <li><a href="<?php echo URLROOT; ?>/categories">Catégories</a></li>
+          <li><a href="<?php echo URLROOT; ?>/seuils/index">Seuils</a></li>
+          <li><a href="<?php echo URLROOT; ?>/affectations/index">Affectations</a></li>
         </ul>
       </li>
     </ul>

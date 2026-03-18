@@ -15,8 +15,8 @@
             <hr>
             <thead>
               <tr>
-                <th><i class="fa fa-hashtag"></i> ID Rec</th>
-                <th><i class="fa fa-microchip"></i> ID Capteur</th>
+                <th><i class="fa fa-hashtag"></i> Id Record</th>
+                <th><i class="fa fa-microchip"></i> Nom Capteur</th>
                 <th><i class="fa fa-fire"></i> Température</th>
                 <th><i class="fa fa-tint"></i> Humidité</th>
                 <th><i class="fa fa-calendar"></i> Date & Heure</th>
@@ -26,7 +26,7 @@
               <?php foreach($data['records'] as $record) : ?>
               <tr>
                 <td><?php echo $record->id_rec; ?></td>
-                <td><?php echo $record->id_cap; ?></td>
+                <td><?php echo $record->Nom_cap; ?></td>
                 
                 <td>
                     <?php if($record->tmp > 30) : ?>

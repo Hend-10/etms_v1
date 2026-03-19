@@ -79,4 +79,11 @@ public function updateProfileImage($id, $image) {
     $this->db->bind(':id', $id);
     return $this->db->execute();
 }
+public function addLog($id_user, $action, $details = "") {
+    $this->db->query("INSERT INTO logs (id_user, action, details) VALUES (:id_user, :action, :details)");
+    $this->db->bind(':id_user', $id_user);
+    $this->db->bind(':action', $action);
+    $this->db->bind(':details', $details);
+    return $this->db->execute();
+}
 }

@@ -68,6 +68,13 @@
             <li><a href="<?php echo URLROOT; ?>/affectations/index">Affectations</a></li>
           </ul>
         </li>
+
+        <li>
+          <a href="<?php echo URLROOT; ?>/logs/index">
+            <i class="fa fa-history"></i>
+            <span>Journal d'activités</span>
+          </a>
+        </li>
       <?php endif; ?>
 
       <li>

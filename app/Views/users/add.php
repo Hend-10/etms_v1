@@ -29,7 +29,7 @@
               <label class="col-sm-2 col-sm-2 control-label">Email</label>
               <div class="col-sm-10">
                 <input type="email" name="email" class="form-control" required>
-                <span class="text-danger"><?php echo $data['email_err']; ?></span>
+                <span class="text-danger"><?php echo $data['email']; ?></span>
               </div>
             </div>
 

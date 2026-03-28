@@ -45,4 +45,17 @@ class Record {
         }
         return false;
     }
+    public function getRecordsByInterval() {
+    $this->db->query("SELECT 
+                        MIN(id_rec) as id_rec, 
+                        capteur.Nom_cap, 
+                        AVG(tmp) as tmp, 
+                        AVG(th) as th, 
+                        FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(date_rec) / 1800) * 1800) as date_rec
+                      FROM records 
+                      INNER JOIN capteur ON records.id_cap = capteur.id_cap 
+                      GROUP BY capteur.Nom_cap, FLOOR(UNIX_TIMESTAMP(date_rec) / 1800)
+                      ORDER BY date_rec DESC");
+    return $this->db->resultSet();
+}
 }

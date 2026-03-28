@@ -86,4 +86,20 @@ public function addLog($id_user, $action, $details = "") {
     $this->db->bind(':details', $details);
     return $this->db->execute();
 }
+public function updateUser($data) {
+    if ($data['password'] != null) {
+        $this->db->query("UPDATE utilisateur SET nom=:nom, prenom=:prenom, email=:email, id_groupe=:id_groupe, password=:password WHERE id_user=:id_user");
+        $this->db->bind(':password', $data['password']);
+    } else {
+        $this->db->query("UPDATE utilisateur SET nom=:nom, prenom=:prenom, email=:email, id_groupe=:id_groupe WHERE id_user=:id_user");
+    }
+
+    $this->db->bind(':nom', $data['nom']);
+    $this->db->bind(':prenom', $data['prenom']);
+    $this->db->bind(':email', $data['email']);
+    $this->db->bind(':id_groupe', $data['id_groupe']);
+    $this->db->bind(':id_user', $data['id_user']);
+    
+    return $this->db->execute();
+}
 }

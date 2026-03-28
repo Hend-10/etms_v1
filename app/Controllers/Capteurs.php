@@ -2,15 +2,17 @@
 class Capteurs extends Controller {
     public function __construct() {
         if(!isset($_SESSION['user_id'])) {
-        header('location: ' . URLROOT . '/users/login');
-        exit();
-    }
+            header('location: ' . URLROOT . '/users/login');
+            exit();
+        }
 
-    if($_SESSION['user_role'] != 'Administrateur') {
-        header('location: ' . URLROOT . '/pages/index');
-        exit();
-    }
+        if($_SESSION['user_role'] != 'Administrateur') {
+            header('location: ' . URLROOT . '/pages/index');
+            exit();
+        }
+        
         $this->capteurModel = $this->model('Capteur');
+        $this->logModel = $this->model('LogModel');
     }
 
     public function index() {
@@ -23,6 +25,8 @@ class Capteurs extends Controller {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = ['nom' => trim($_POST['nom'])];
             if($this->capteurModel->addCapteur($data)) {
+                $this->logModel->addLog($_SESSION['user_id'], 'Création', "Ajout d'un nouveau capteur : " . $data['nom']);
+                
                 header('location: ' . URLROOT . '/capteurs/index');
             }
         } else {
@@ -32,6 +36,8 @@ class Capteurs extends Controller {
 
     public function delete($id) {
         if($this->capteurModel->deleteCapteur($id)) {
+            $this->logModel->addLog($_SESSION['user_id'], 'Suppression', "Suppression du capteur ID : " . $id);
+            
             header('location: ' . URLROOT . '/capteurs/index');
         }
     }
@@ -44,6 +50,8 @@ class Capteurs extends Controller {
             ];
 
             if($this->capteurModel->updateCapteur($data)) {
+                $this->logModel->addLog($_SESSION['user_id'], 'Modification', "Mise à jour du capteur ID $id : " . $data['nom']);
+                
                 header('location: ' . URLROOT . '/capteurs/index');
             }
         } else {

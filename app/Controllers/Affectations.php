@@ -1,20 +1,21 @@
 <?php
 class Affectations extends Controller {
     public function __construct() {
-    if(!isset($_SESSION['user_id'])) {
-        header('location: ' . URLROOT . '/users/login');
-        exit();
-    }
+        if(!isset($_SESSION['user_id'])) {
+            header('location: ' . URLROOT . '/users/login');
+            exit();
+        }
 
-    if($_SESSION['user_role'] != 'Administrateur') {
-        header('location: ' . URLROOT . '/pages/index');
-        exit();
-    }
+        if($_SESSION['user_role'] != 'Administrateur') {
+            header('location: ' . URLROOT . '/pages/index');
+            exit();
+        }
 
-    $this->affectationModel = $this->model('Affectation');
-    $this->capteurModel = $this->model('Capteur');
-    $this->emplacementModel = $this->model('Emplacement');
-}
+        $this->affectationModel = $this->model('Affectation');
+        $this->capteurModel = $this->model('Capteur');
+        $this->emplacementModel = $this->model('Emplacement');
+        $this->logModel = $this->model('LogModel'); 
+    }
 
     public function index() {
         $affectations = $this->affectationModel->getAffectations();
@@ -38,6 +39,7 @@ class Affectations extends Controller {
             ];
 
             if($this->affectationModel->addAffectation($data)) {
+                $this->logModel->addLog($_SESSION['user_id'], 'Affectation', "Capteur ID " . $data['id_cap'] . " affecté à l'emplacement ID " . $data['id_emp']);
                 header('location: ' . URLROOT . '/affectations');
             }
         }
@@ -45,6 +47,7 @@ class Affectations extends Controller {
 
     public function delete($id) {
         if($this->affectationModel->deleteAffectation($id)) {
+            $this->logModel->addLog($_SESSION['user_id'], 'Désaffectation', "Suppression de l'affectation ID : " . $id);
             header('location: ' . URLROOT . '/affectations');
         }
     }

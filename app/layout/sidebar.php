@@ -66,6 +66,7 @@
             <li><a href="<?php echo URLROOT; ?>/emplacements/index">Emplacements</a></li>
             <li><a href="<?php echo URLROOT; ?>/seuils/index">Seuils</a></li>
             <li><a href="<?php echo URLROOT; ?>/affectations/index">Affectations</a></li>
+            <li><a href="<?php echo URLROOT; ?>/cartographie/index">Cartographie</a></li>
           </ul>
         </li>
 

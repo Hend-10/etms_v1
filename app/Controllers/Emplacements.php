@@ -6,6 +6,7 @@ class Emplacements extends Controller {
             exit();
         }
         $this->emplacementModel = $this->model('Emplacement');
+        $this->logModel = $this->model('LogModel'); 
     }
 
     public function index() {
@@ -18,6 +19,7 @@ class Emplacements extends Controller {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = ['nom' => trim($_POST['nom_emp'])];
             if($this->emplacementModel->addEmplacement($data)) {
+                $this->logModel->addLog($_SESSION['user_id'], 'Création', "Ajout d'un nouvel emplacement : " . $data['nom']);
                 header('location: ' . URLROOT . '/emplacements/index');
             }
         } else {
@@ -32,6 +34,7 @@ class Emplacements extends Controller {
                 'nom' => trim($_POST['nom_emp'])
             ];
             if($this->emplacementModel->updateEmplacement($data)) {
+                $this->logModel->addLog($_SESSION['user_id'], 'Modification', "Mise à jour de l'emplacement ID $id : " . $data['nom']);
                 header('location: ' . URLROOT . '/emplacements/index');
             }
         } else {
@@ -46,6 +49,7 @@ class Emplacements extends Controller {
 
     public function delete($id) {
         if($this->emplacementModel->deleteEmplacement($id)) {
+            $this->logModel->addLog($_SESSION['user_id'], 'Suppression', "Suppression de l'emplacement ID : " . $id);
             header('location: ' . URLROOT . '/emplacements/index');
         }
     }

@@ -1,13 +1,16 @@
 <?php require APPROOT . '/layout/head.php'; ?>
-<?php require APPROOT . '/layout/header.php'; ?>
-<?php require APPROOT . '/layout/sidebar.php'; ?>
 
+<?php /* Load DataTables CSS in the <head> via head.php — add these lines there,
+         OR keep them here since they are just stylesheets and order doesn't matter for CSS */ ?>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
 
+<?php require APPROOT . '/layout/header.php'; ?>
+<?php require APPROOT . '/layout/sidebar.php'; ?>
+
 <section id="main-content">
   <section class="wrapper">
-    
+
     <div class="row">
       <div class="col-lg-12">
         <h3 class="page-header"><i class="fa fa-history"></i> Journal d'audit</h3>
@@ -22,9 +25,9 @@
       <div class="col-md-12">
         <div class="content-panel" style="padding: 15px; background: #fff; border-radius: 5px; box-shadow: 0 2px 1px rgba(0,0,0,0.05);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-             <h4><i class="fa fa-angle-right"></i> Historique des actions (Qui a fait quoi quand)</h4>
+            <h4><i class="fa fa-angle-right"></i> Historique des actions (Qui a fait quoi quand)</h4>
           </div>
-          
+
           <table id="logsTable" class="table table-striped table-advance table-hover">
             <thead>
               <tr>
@@ -36,16 +39,16 @@
             </thead>
             <tbody>
               <?php if (!empty($data['logs'])): ?>
-                <?php foreach($data['logs'] as $log): ?>
+                <?php foreach ($data['logs'] as $log): ?>
                 <tr>
-                  <td style="font-weight: 600;"><?php echo htmlspecialchars($log->nom_utilisateur); ?></td>
+                  <td style="font-weight:600;"><?php echo htmlspecialchars($log->nom_utilisateur); ?></td>
                   <td>
-                    <?php 
+                    <?php
                       $action = strtolower($log->action);
-                      $label = 'info';
-                      if (mb_strpos($action, 'supprim') !== false) $label = 'danger';
-                      if (mb_strpos($action, 'ajout') !== false) $label = 'success';
-                      if (mb_strpos($action, 'connexion') !== false) $label = 'primary';
+                      if      (mb_strpos($action, 'supprim')  !== false) $label = 'danger';
+                      elseif  (mb_strpos($action, 'ajout')    !== false) $label = 'success';
+                      elseif  (mb_strpos($action, 'connexion')!== false) $label = 'primary';
+                      else                                                $label = 'info';
                     ?>
                     <span class="label label-<?php echo $label; ?>"><?php echo htmlspecialchars($log->action); ?></span>
                   </td>
@@ -65,6 +68,7 @@
   </section>
 </section>
 
+<?php require APPROOT . '/layout/footer.php'; ?>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -73,18 +77,11 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
 
 <script>
-// Use a check to ensure jQuery is ready before calling DataTable
-function initDataTable() {
-    if (typeof $.fn.DataTable === "undefined") {
-        console.error("DataTables library not loaded yet. Retrying...");
-        setTimeout(initDataTable, 100);
-        return;
-    }
-
+$(document).ready(function () {
     $('#logsTable').DataTable({
-        "order": [[ 3, "desc" ]],
-        "dom": 'Bfrtip',
-        "buttons": [
+        order: [[3, 'desc']],
+        dom: 'Bfrtip',
+        buttons: [
             {
                 extend: 'excelHtml5',
                 text: '<i class="fa fa-file-excel-o"></i> Excel',
@@ -96,15 +93,9 @@ function initDataTable() {
                 className: 'btn btn-danger btn-sm'
             }
         ],
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json"
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
         }
     });
-}
-
-$(document).ready(function() {
-    initDataTable();
 });
 </script>
-
-<?php require APPROOT . '/layout/footer.php'; ?>

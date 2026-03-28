@@ -3,7 +3,7 @@
         <div class="fa fa-bars tooltips" data-placement="right" data-original-title="Toggle Navigation"></div>
     </div>
     
-    <a href="<?php echo URLROOT; ?>/home" class="logo"><b>CLIMA <span>TRACK</span></b></a>
+    <a href="<?php echo URLROOT; ?>/home" class="logo"><b>ET<span>MS</span></b></a>
     <div class="nav notify-row" id="top_menu">
         </div>
     
